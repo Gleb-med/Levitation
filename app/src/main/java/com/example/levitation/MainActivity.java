@@ -12,6 +12,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+
         //Set window to fullscreen (hide status bar)
         Window window  = getWindow();
         window.setFlags(
