@@ -20,6 +20,7 @@ import androidx.core.content.ContextCompat;
 class Game extends SurfaceView implements SurfaceHolder.Callback {
 
     private final Player player;
+    private final Joystick joystick;
     private GameLoop gameLoop;
 
     public Game(Context context) {
@@ -31,7 +32,8 @@ class Game extends SurfaceView implements SurfaceHolder.Callback {
 
         gameLoop = new GameLoop(this, surfaceHolder);
 
-        // Initialize player
+        // Initialize game objects
+        joystick = new Joystick(275,1800,140, 80);
         player = new Player(getContext(), 1000, 500, 50);
 
         setFocusable(true);
@@ -43,10 +45,21 @@ class Game extends SurfaceView implements SurfaceHolder.Callback {
         // Handle touch events
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
-                player.setPosition((double) event.getX(), (double) event.getY());
+                if (joystick.isPressed((double) event.getX(), (double) event.getY())) {
+                    joystick.setIsPressed(true);
+                }
+
+                //player.setPosition((double) event.getX(), (double) event.getY()); пригодится
                 return true;
             case MotionEvent.ACTION_MOVE:
-                player.setPosition((double) event.getX(), (double) event.getY());
+                if (joystick.getIsPressed()) {
+                    joystick.setActuator((double) event.getX(), (double) event.getY());
+                }
+                //player.setPosition((double) event.getX(), (double) event.getY());
+                return true;
+            case MotionEvent.ACTION_UP:
+                joystick.setIsPressed(false);
+                joystick.resetActuator();
                 return true;
         }
 
@@ -75,6 +88,7 @@ class Game extends SurfaceView implements SurfaceHolder.Callback {
         drawUPS(canvas);
         drawFPS(canvas);
 
+        joystick.draw(canvas);
         player.draw(canvas);
     }
 
@@ -99,6 +113,7 @@ class Game extends SurfaceView implements SurfaceHolder.Callback {
 
     public void update() {
         // update game state
-        player.update();
+        joystick.update();
+        player.update(joystick);
     }
 }
